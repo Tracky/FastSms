@@ -1,17 +1,30 @@
 package com.example.fastsms.app;
 
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.example.fastsms.app.fragments.ContactsFragment;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity implements ContactsFragment.Callbacks{
+    private String FRAGMENT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentById(R.id.fragmentContainer);
+
+        if (fragment == null) {
+            fragment = createFragment();
+            fragmentManager.beginTransaction().add(R.id.fragmentContainer, fragment).commit();
+        }
     }
 
     @Override
@@ -35,4 +48,32 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    private Fragment createFragment() {
+        if (FRAGMENT == null) {
+            return ContactsFragment.newInstance(null);
+        } else if (FRAGMENT.equals("ConcreteFragment")) {
+
+        }
+        return null;
+    }
+    //---------Callback-------------
+    @Override
+    public void onFragmentSelected(String strFragment) {
+        FRAGMENT = strFragment;
+        Fragment fragment = createFragment();
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).
+                replace(R.id.fragmentContainer, fragment).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onFragmentSelected(String strFragment, Bundle args) {
+        FRAGMENT = strFragment;
+        Fragment fragment = createFragment();
+        fragment.setArguments(args);
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).
+                replace(R.id.fragmentContainer, fragment).addToBackStack(null).commit();
+    }
+
 }
